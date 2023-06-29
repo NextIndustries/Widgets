@@ -1,0 +1,92 @@
+<form #rpcForm="ngForm" (submit)="sendCommand()">
+    <div class="mat-content mat-padding" fxLayout="column">
+        
+    <div mat-dialog-content fxLayout="column">
+
+  <div fxLayout="row" fxLayoutGap="8px" fxLayout.xs="column" fxLayoutGap.xs="0">
+         <mat-form-field class="mat-block">
+        <mat-label>Ftp Url</mat-label>
+        <input matInput required name="serverUrl" #rpcMethodField="ngModel" [(ngModel)]="serverUrl"/>
+        <mat-error *ngIf="rpcMethodField.hasError('required')">
+          Url is required.
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="mat-block">
+        <mat-label>Folder</mat-label>
+        <input matInput required name="folder" #rpcMethodField="ngModel" [(ngModel)]="folder"/>
+        <mat-error *ngIf="rpcMethodField.hasError('required')">
+          Folder is required.
+        </mat-error>
+      </mat-form-field>
+      </div>
+
+      <div fxLayout="row" fxLayoutGap="8px" fxLayout.xs="column" fxLayoutGap.xs="0">
+        <mat-form-field class="mat-block">
+       <mat-label>Username</mat-label>
+       <input matInput required name="username" #rpcMethodField="ngModel" [(ngModel)]="username"/>
+       <mat-error *ngIf="rpcMethodField.hasError('required')">
+         Username is required.
+       </mat-error>
+     </mat-form-field>
+     <mat-form-field class="mat-block">
+       <mat-label>Password</mat-label>
+       <input matInput type="password" required name="password" #rpcMethodField="ngModel" [(ngModel)]="password"/>
+       <mat-error *ngIf="rpcMethodField.hasError('required')">
+         Password is required.
+       </mat-error>
+     </mat-form-field>
+     </div>
+
+     <div fxLayout="row" fxLayoutGap="8px" fxLayout.xs="column" fxLayoutGap.xs="0">
+        <mat-form-field class="mat-block">
+       <mat-label>Port</mat-label>
+       <input matInput required name="port" type="number" #rpcMethodField="ngModel" [(ngModel)]="port"/>
+       <mat-error *ngIf="rpcMethodField.hasError('required')">
+        Port is required.
+       </mat-error>
+     </mat-form-field>
+     <mat-form-field class="mat-block">
+       <mat-label>Tries</mat-label>
+       <input matInput type="tries" required name="password" #rpcMethodField="ngModel" [(ngModel)]="tries"/>
+       <mat-error *ngIf="rpcMethodField.hasError('required')">
+        Tries is required.
+       </mat-error>
+     </mat-form-field>
+     </div>
+
+     <div fxLayout="row" fxLayoutGap="8px" fxLayout.xs="column" fxLayoutGap.xs="0">
+        <mat-form-field>
+            <mat-label>Method</mat-label>
+            <mat-select [(ngModel)]="selectedMethod">
+              <mat-option value="DAILY">Daily</mat-option>
+              <mat-option value="WEEKLY">Weekly</mat-option>
+              <mat-option value="MONTHLY">Monthly</mat-option>
+            </mat-select>
+          </mat-form-field>
+        
+          <mat-form-field class="mat-block">
+            <input matInput name="selectedHour" #rpcMethodField="ngModel" [(ngModel)]="selectedHour"
+            placeholder="Hour" type="number" min="0" max="23" required/>
+            <mat-error *ngIf="rpcMethodField.hasError('required')">
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field class="mat-block">
+            <input matInput name="selectedMinute" #rpcMethodField="ngModel" [(ngModel)]="selectedMinute"
+            placeholder="Minute" type="number" min="0" max="59" required/>
+            <mat-error *ngIf="rpcMethodField.hasError('required')">
+            </mat-error>
+          </mat-form-field>
+     </div>
+
+      </div>
+      <button [disabled]="rpcForm.invalid || !rpcForm.dirty" mat-raised-button color="primary" type="submit" >
+        Create
+      </button>
+     </div>
+
+      <div>
+        
+      </div>
+
+  </form>

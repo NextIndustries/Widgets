@@ -1,0 +1,143 @@
+<form *ngIf="scheduleEventFormGroup" [formGroup]="scheduleEventFormGroup" (ngSubmit)="createEvent()">
+  <div class="mat-content mat-padding" fxLayout="column">
+      
+  <div mat-dialog-content fxLayout="column">
+
+<div fxLayout="row" fxLayoutGap="8px" fxLayout.xs="column" fxLayoutGap.xs="0">
+    
+       <mat-form-field class="mat-block">
+      <mat-label>Ftp Url</mat-label>
+      <input matInput required formControlName="serverUrl"/>
+    </mat-form-field>
+    
+    <mat-form-field class="mat-block">
+      <mat-label>Port</mat-label>
+      <input matInput required formControlName="port" type="number" min="1" max="65535"/>
+    </mat-form-field>
+    
+  </div>
+
+  <div fxLayout="row" fxLayoutGap="8px" fxLayout.xs="column" fxLayoutGap.xs="0">
+    
+      <mat-form-field class="mat-block">
+      <mat-label>Username</mat-label>
+      <input matInput required formControlName="username"/>
+    </mat-form-field>
+    
+    <mat-form-field class="mat-block">
+      <mat-label>Password</mat-label>
+      <input matInput required type="password" formControlName="password"/>
+    </mat-form-field>
+    
+    </div>
+    
+    <div style="padding-bottom: 20px;" fxLayout="column" fxLayoutGap="8px" fxLayout.xs="column" fxLayoutGap.xs="0">
+
+        <button  mat-raised-button color="primary" 
+        [disabled]="scheduleEventFormGroup.invalid || !scheduleEventFormGroup.dirty || isTestingConnection" 
+        type="button"
+        (click)="testConnection()">
+          Test Connection
+        </button>
+
+        <div class="help-block" *ngIf="connectionSuccessfull === true" style="padding-top: 5px;">
+          <span>Connection Successfull</span>
+          <mat-icon *ngIf="connectionSuccessfull === true" style="color: green;">check_circle</mat-icon>
+        </div>
+
+        <div class="help-block" *ngIf="connectionSuccessfull === false" style="padding-top: 5px;">
+          <span>Check Ftp Credentials</span>
+          <mat-icon *ngIf="connectionSuccessfull === false" style="color: red;">error</mat-icon>
+        </div>
+
+    </div>
+
+    <div fxLayout="column" fxLayoutGap="8px" fxLayout.xs="column" fxLayoutGap.xs="0">
+    
+      <mat-form-field class="mat-block">
+      <mat-label>Folder</mat-label>
+      <input matInput formControlName="folder"/>
+    </mat-form-field>
+
+    </div>
+    
+     <div fxLayout="column" fxLayoutGap="8px" fxLayout.xs="column" fxLayoutGap.xs="0">
+    
+      <mat-form-field class="mat-block">
+      <mat-label>Device</mat-label>
+      <mat-select formControlName="device">
+          <mat-option *ngFor="let deviceId of devices" [value]="deviceId.id">{{ deviceId.name }}</mat-option>
+          </mat-select>
+    </mat-form-field>
+    
+    </div>
+    
+    <div fxLayout="row" fxLayoutGap="8px" fxLayout.xs="column" fxLayoutGap.xs="0">
+    
+       <mat-form-field>
+          <mat-label>Method</mat-label>
+          <mat-select formControlName="scheduleMethod">
+            <mat-option value="DAILY">Daily</mat-option>
+            <mat-option value="WEEKLY">Weekly</mat-option>
+            <mat-option value="MONTHLY">Monthly</mat-option>
+          </mat-select>
+        </mat-form-field>
+        
+         <mat-form-field *ngIf="scheduleEventFormGroup.get('scheduleMethod').value === 'WEEKLY'">
+  <mat-label>Day</mat-label>
+  <mat-select formControlName="scheduleDay" required type="number">
+    <mat-option value="1">Monday</mat-option>
+    <mat-option value="2">Tuesday</mat-option>
+    <mat-option value="3">Wednesday</mat-option>
+    <mat-option value="4">Thursday</mat-option>
+    <mat-option value="5">Friday</mat-option>
+    <mat-option value="6">Saturday</mat-option>
+    <mat-option value="7">Sunday</mat-option>
+  </mat-select>
+</mat-form-field>
+
+<mat-form-field *ngIf="scheduleEventFormGroup.get('scheduleMethod').value === 'MONTHLY'">
+  <mat-label>Day</mat-label>
+  <input matInput formControlName="scheduleDay" required type="number" min="1" max="31" />
+  <mat-error *ngIf="scheduleEventFormGroup.get('scheduleDay').invalid && (scheduleEventFormGroup.get('scheduleDay').touched || scheduleEventFormGroup.get('scheduleDay').dirty)">
+  Day must be between 1 and 31.
+</mat-error>
+</mat-form-field>
+    
+    </div>
+    
+    <div fxLayout="row" fxLayoutGap="8px" fxLayout.xs="column" fxLayoutGap.xs="0">
+    
+      <mat-form-field class="mat-block">
+      <mat-label>Hour</mat-label>
+      <input matInput formControlName="scheduleHour" required type="number" min="0" max="23" />
+    </mat-form-field>
+    
+    <mat-form-field class="mat-block">
+      <mat-label>Minute</mat-label>
+      <input matInput formControlName="scheduleMinute" required type="number" min="0" max="59" />
+    </mat-form-field>
+    
+    </div>
+
+
+    </div>
+    
+    <div fxLayout="column" fxLayoutGap="8px" fxLayout.xs="column" fxLayoutGap.xs="0">
+    <button mat-raised-button color="primary" [disabled]="scheduleEventFormGroup.invalid || !scheduleEventFormGroup.dirty || !connectionSuccessfull" type="submit" >
+      Create
+    </button>
+    
+    <button mat-raised-button color="warn" type="button" (click)="cancelEvent()">
+        Cancel
+    </button>
+    
+    </div>
+    
+   </div>
+
+    <div>
+      
+    </div>
+
+</form>

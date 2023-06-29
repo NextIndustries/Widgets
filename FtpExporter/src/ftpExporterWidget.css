@@ -1,0 +1,42 @@
+.attribute-update-form {
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.attribute-update-form__grid {
+    display: flex;
+}
+.grid__element:first-child {
+    flex: 1;
+}
+.grid__element:last-child {
+    margin-top: 19px;
+    margin-left: 7px;
+}
+.grid__element {
+    display: flex;
+}
+
+.attribute-update-form .mat-button.mat-icon-button {
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    min-height: 32px;
+    padding: 0 !important;
+    margin: 0 !important;
+    line-height: 20px;
+}
+
+.attribute-update-form .mat-icon-button mat-icon {
+    width: 20px;
+    min-width: 20px;
+    height: 20px;
+    min-height: 20px;
+    font-size: 20px;
+}
+
+.tb-toast {
+    font-size: 14px!important;
+}
