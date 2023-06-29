@@ -1,0 +1,51 @@
+<form *ngIf="attributeUpdateFormGroup" [formGroup]="attributeUpdateFormGroup" (ngSubmit)="onSubmit()">
+  <div class="mat-content mat-padding" fxLayout="column">
+      
+  <div mat-dialog-content fxLayout="column">
+
+<div fxLayout="row" fxLayoutGap="8px" fxLayout.xs="column" fxLayoutGap.xs="0">
+    
+    <mat-form-field class="mat-block">
+      <mat-label>Device</mat-label>
+      <mat-select formControlName="device" (selectionChange)="onDeviceSelected()">
+        <mat-option *ngFor="let device of devices" [value]="device.id">{{device.name}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    
+    <mat-form-field class="mat-block">
+      <mat-label>Data Key</mat-label>
+      <mat-select formControlName="timeseriesKey">
+        <mat-option *ngFor="let dataKey of selectedDevice?.dataKeys" [value]="dataKey.name">{{ dataKey.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    
+    </div>
+
+    <div fxLayout="row" fxLayoutGap="8px" fxLayout.xs="column" fxLayoutGap.xs="0">
+
+      <mat-form-field class="mat-block">
+          <mat-label>Start Time</mat-label>
+          <input matInput [matDatepicker]="startTimePicker" formControlName="startTime" required readonly>
+          <mat-datepicker-toggle matSuffix [for]="startTimePicker"></mat-datepicker-toggle>
+          <mat-datepicker #startTimePicker></mat-datepicker>
+      </mat-form-field>
+      
+      <mat-form-field class="mat-block">
+          <mat-label>End Time</mat-label>
+          <input matInput [matDatepicker]="endTimePicker" formControlName="endTime" required readonly>
+          <mat-datepicker-toggle matSuffix [for]="endTimePicker"></mat-datepicker-toggle>
+          <mat-datepicker #endTimePicker></mat-datepicker>
+      </mat-form-field>
+  </div>
+
+    </div>
+    <button mat-raised-button color="primary" [disabled]="attributeUpdateFormGroup.invalid" type="submit" >
+      Download
+    </button>
+   </div>
+
+    <div>
+      
+    </div>
+
+</form>
