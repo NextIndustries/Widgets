@@ -11,7 +11,6 @@ self.onInit = function () {
 function init() {
 
     const $scope = self.ctx.$scope;
-    console.log(self.ctx);
     
     const attributeService = $scope.$injector.get(self.ctx.servicesMap.get('attributeService'));
     const importExportService = $scope.$injector.get(self.ctx.servicesMap.get('importExport'));
@@ -47,7 +46,6 @@ function init() {
                         $scope.selectedDevice = $scope.devices[0];
                         $scope.attributeUpdateFormGroup.get('device').setValue($scope.selectedDevice.id);
                         $scope.attributeUpdateFormGroup.get('timeseriesKey').setValue($scope.selectedDevice.dataKeys[0]);
-                        console.log($scope.selectedDevice.dataKeys[0]);
                     });
                 });
             });
