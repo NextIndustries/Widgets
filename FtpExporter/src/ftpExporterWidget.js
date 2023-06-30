@@ -10,16 +10,9 @@ self.onInit = function () {
 
 
 function init() {
-    
-    console.log(self);
 
     $scope = self.ctx.$scope;
     const entityId = self.ctx.datasources[0].entity.id;
-    
-    let userId;
-    if(self.ctx.currentUser.authority === 'CUSTOMER_USER'){
-        userId = {entityType: 'USER', id: self.ctx.currentUser.userId};
-    }
     
     $scope.connectionSuccessfull;
     $scope.isTestingConnection = false;
@@ -128,9 +121,8 @@ function init() {
                 function (data) {
                     $scope.showSuccessToast('Event scheduled', 1000, 'top', 'right', self.ctx.toastTargetId);
                     getData();
-                    if(userId){
                         attributeService.saveEntityAttributes(
-                        userId,
+                        entityId,
                         'SERVER_SCOPE',
                         [
                             {
@@ -148,7 +140,6 @@ function init() {
                                 }
                             }]
                     ).subscribe();
-                    }
                     
                     self.ctx.detectChanges();
                 },
@@ -240,10 +231,10 @@ function init() {
 
     function fetchForm() {
 
-        if (entityId.entityType === 'CUSTOMER' && userId) {
+        if (entityId.entityType === 'CUSTOMER') {
 
             attributeService.getEntityAttributes(
-                userId,
+                entityId,
                 'SERVER_SCOPE',
                 ['ftp_details']
             ).subscribe(
