@@ -1,136 +1,116 @@
-const limit = 500;
+// Widget Code
+// Joins all timeseries data with timestamps for creating a csv file
 
-self.onInit = function () {
-    self.ctx.ngZone.run(function () {
-        init();
-        self.ctx.detectChanges(true);
-    });
+let $injector = widgetContext.$scope.$injector;
+let customDialog = $injector.get(widgetContext.servicesMap.get('customDialog'));
+let attributeService = $injector.get(widgetContext.servicesMap.get('attributeService'));
+let importExportService = $injector.get(widgetContext.servicesMap.get('importExport'));
 
-};
+const dataKeysNames = widgetContext.datasources[0].dataKeys.map(dataKey => dataKey.name);
 
-function init() {
+openEditEntityDialog();
 
-    const $scope = self.ctx.$scope;
-    const attributeService = $scope.$injector.get(self.ctx.servicesMap.get('attributeService'));
-    const importExportService = $scope.$injector.get(self.ctx.servicesMap.get('importExport'));
-    const deviceService = $scope.$injector.get(self.ctx.servicesMap.get('deviceService'));
-    const entityService = $scope.$injector.get(self.ctx.servicesMap.get('entityService'));
-
-    const pageLink = self.ctx.pageLink(10);
-    
-    $scope.devices = [];
-
-    $scope.startTime = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // 7 days ago
-    $scope.endTime = new Date(); // Now
-
-    deviceService.getTenantDeviceInfos(pageLink).subscribe(device => {
-                device.data.forEach(res => {
-                    entityService.getEntityKeys(res.id, '', 'timeseries').subscribe(e => {
-                       e.unshift('All');
-                       $scope.devices.push({
-                        name: res.name,
-                        id: res.id,
-                        dataKeys: e
-                        });
-                        $scope.selectedDevice = $scope.devices[0];
-                        $scope.attributeUpdateFormGroup.get('device').setValue($scope.selectedDevice.id);
-                    });
-                });
-
-            });
-
-    $scope.attributeUpdateFormGroup = $scope.fb.group({
-        device: [],
-        startTime: [$scope.startTime],
-        endTime: [$scope.endTime],
-        timeseriesKey: ['All']
-    });
-
-
-    self.ctx.$scope.onDeviceSelected = function () {
-        $scope.selectedDevice = $scope.devices.find(device => device.id === $scope.attributeUpdateFormGroup.get('device').value);
-    };
-
-    self.ctx.$scope.onSubmit = function () {
-
-        if ($scope.attributeUpdateFormGroup.value.timeseriesKey === 'All') {
-            $scope.attributeUpdateFormGroup.value.timeseriesKey = $scope.selectedDevice.dataKeys
-            .filter(key => key !== 'All')
-        } else {
-            $scope.attributeUpdateFormGroup.value.timeseriesKey = [$scope.attributeUpdateFormGroup.value.timeseriesKey];
-        }
-
-        console.log($scope.attributeUpdateFormGroup);
-        attributeService.getEntityTimeseries(
-            $scope.attributeUpdateFormGroup.value.device, 
-            $scope.attributeUpdateFormGroup.value.timeseriesKey,
-            $scope.attributeUpdateFormGroup.value.startTime.getTime(), 
-            $scope.attributeUpdateFormGroup.value.endTime.getTime(), 
-            limit).subscribe(function (data) {
-                data.entityId = $scope.selectedDevice.id;
-                data.entityName = $scope.selectedDevice.name;
-                    exportCsv([data], 'file');
-              
-            });
-    };
-
-    function exportCsv(data, filename) {
-        const CSV_TYPE = { extension: 'csv', mimeType: 'text/csv' };
-        let colsHead;
-        let colsData;
-
-        if (data && data.length) {
-            const dataKeys = Object.keys(data[0]).filter(key => key !== 'entityName' && key !== 'entityId');
-            colsHead = `timestamp,date,entityId,entityName,${dataKeys.join(',')}`;
-
-            colsData = data.flatMap(obj => {
-                const entityName = obj.entityName;
-                const entityId = obj.entityId;
-                const timestamps = {};
-
-                dataKeys.forEach(key => {
-                    if (Array.isArray(obj[key])) {
-                        obj[key].forEach(temp => {
-                            const { ts, value } = temp;
-                            const date = new Date(ts).toISOString();
-                            const rowKey = `${ts}`;
-
-                            if (!timestamps[rowKey]) {
-                                timestamps[rowKey] = {
-                                    timestamp: ts,
-                                    date: date,
-                                    entityId,
-                                    entityName
-                                };
-                                dataKeys.forEach(k => (timestamps[rowKey][k] = ''));
-                            }
-
-                            timestamps[rowKey][key] = value;
-                        });
-                    }
-                });
-
-                return Object.values(timestamps).map(row => {
-                    const rowData = [row.timestamp, row.date, row.entityId, row.entityName].concat(
-                        dataKeys.map(key => row[key])
-                    );
-                    return rowData.join(',');
-                });
-            });
-        } else {
-            colsHead = '';
-            colsData = [];
-        }
-
-        const csvData = `${colsHead}\n${colsData.join('\n')}`;
-        importExportService.downloadFile(csvData, filename, CSV_TYPE);
-    }
-
+function openEditEntityDialog() {
+  customDialog.customDialog(htmlTemplate, EditEntityDialogController).subscribe();
 }
 
-self.typeParameters = function () {
-    return {
-        dataKeysOptional: false,
-        singleEntity: false
+function EditEntityDialogController(instance) {
+  let vm = instance;
+
+  vm.entityNames = [];
+
+  vm.timeseriesKeys = ['all', ...dataKeysNames];
+
+  vm.entityName = entityName;
+  vm.entityNames.push(entityName);
+  vm.startTime = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // 7 days ago
+  vm.endTime = new Date();
+  vm.timeseriesKey = vm.timeseriesKeys[0];
+
+  vm.editEntityFormGroup = vm.fb.group({
+    entityName: [vm.entityName, [vm.validators.required]],
+    startTime: [vm.startTime, [vm.validators.required]],
+    endTime: [vm.endTime, [vm.validators.required]],
+    timeseriesKey: [vm.timeseriesKey, [vm.validators.required]]
+  });
+
+  vm.cancel = function() {
+    vm.dialogRef.close(null);
+  };
+
+  vm.save = function() {
+
+    if (vm.editEntityFormGroup.value.timeseriesKey === 'all') {
+      vm.editEntityFormGroup.value.timeseriesKey = dataKeysNames;
+    } else {
+      vm.editEntityFormGroup.value.timeseriesKey = [vm.editEntityFormGroup.value.timeseriesKey];
     }
+
+    getCsv(vm);
+  };
+}
+
+function getCsv(vm) {
+  let testData = [];
+  attributeService.getEntityTimeseries(entityId, vm.editEntityFormGroup.value.timeseriesKey,
+    vm.editEntityFormGroup.value.startTime.getTime(), vm.editEntityFormGroup.value.endTime.getTime()).subscribe(function (data) {
+      data.entityId = entityId.id;
+      data.entityName = entityName;
+      testData.push(data);
+      if (testData.length > 0) {
+        exportCsv(testData, 'file');
+      }
+    });
+}
+
+function exportCsv(data, filename) {
+  const CSV_TYPE = { extension: 'csv', mimeType: 'text/csv' };
+  let colsHead;
+  let colsData;
+
+  if (data && data.length) {
+    const dataKeys = Object.keys(data[0]).filter(key => key !== 'entityName' && key !== 'entityId');
+    colsHead = `timestamp,date,entityId,entityName,${dataKeys.join(',')}`;
+
+    colsData = data.flatMap(obj => {
+      const entityName = obj.entityName;
+      const entityId = obj.entityId;
+      const timestamps = {};
+
+      dataKeys.forEach(key => {
+        if (Array.isArray(obj[key])) {
+          obj[key].forEach(temp => {
+            const { ts, value } = temp;
+            const date = new Date(ts).toISOString();
+            const rowKey = `${ts}`;
+
+            if (!timestamps[rowKey]) {
+              timestamps[rowKey] = {
+                timestamp: ts,
+                date: date,
+                entityId,
+                entityName
+              };
+              dataKeys.forEach(k => (timestamps[rowKey][k] = ''));
+            }
+
+            timestamps[rowKey][key] = value;
+          });
+        }
+      });
+
+      return Object.values(timestamps).map(row => {
+        const rowData = [row.timestamp, row.date, row.entityId, row.entityName].concat(
+          dataKeys.map(key => row[key])
+        );
+        return rowData.join(',');
+      });
+    });
+  } else {
+    colsHead = '';
+    colsData = [];
+  }
+
+  const csvData = `${colsHead}\n${colsData.join('\n')}`;
+  importExportService.downloadFile(csvData, filename, CSV_TYPE);
 }
