@@ -1,48 +1,52 @@
-<form #editEntityForm="ngForm" [formGroup]="editEntityFormGroup" (ngSubmit)="save()" class="edit-entity-form">
-    <mat-toolbar fxLayout="row" color="primary">
-    <h2>Download (.csv)</h2>
-    <span fxFlex></span>
-    <button mat-icon-button (click)="cancel()" type="button">
-        <mat-icon class="material-icons">close</mat-icon>
-    </button>
-    </mat-toolbar>
-
-    <mat-progress-bar color="warn" mode="indeterminate" *ngIf="isLoading$ | async"></mat-progress-bar>
-    <div style="height: 4px;" *ngIf="!(isLoading$ | async)"></div>
-
+<form *ngIf="attributeUpdateFormGroup" [formGroup]="attributeUpdateFormGroup" (ngSubmit)="onSubmit()">
+    <div class="mat-content mat-padding" fxLayout="column">
+        
     <div mat-dialog-content fxLayout="column">
-    <div fxLayout="row" fxLayoutGap="8px" fxLayout.xs="column" fxLayoutGap.xs="0">
-        <mat-form-field fxFlex class="mat-block">
-            <mat-label>Entity Name</mat-label>
-            <mat-select formControlName="entityName" required>
-            <mat-option *ngFor="let entityName of entityNames" [value]="entityName">{{ entityName }}</mat-option>
-            </mat-select>
-        </mat-form-field>
-        <mat-form-field fxFlex class="mat-block">
-            <mat-label>Timeseries Key</mat-label>
-            <mat-select formControlName="timeseriesKey" required>
-            <mat-option *ngFor="let timeseriesKey of timeseriesKeys" [value]="timeseriesKey">{{ timeseriesKey | titlecase}}</mat-option>
-            </mat-select>
-        </mat-form-field>
-    </div>
-    <div fxLayout="row" fxLayoutGap="8px" fxLayout.xs="column" fxLayoutGap.xs="0">
-
-        <mat-form-field fxFlex class="mat-block">
+  
+  <div fxLayout="row" fxLayoutGap="8px" fxLayout.xs="column" fxLayoutGap.xs="0">
+      
+      <mat-form-field class="mat-block">
+        <mat-label>Device</mat-label>
+        <mat-select formControlName="device" (selectionChange)="onDeviceSelected()">
+          <mat-option *ngFor="let device of devices" [value]="device.id">{{device.name}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      
+      <mat-form-field class="mat-block">
+        <mat-label>Data Key</mat-label>
+        <mat-select formControlName="timeseriesKey">
+          <mat-option *ngFor="let dataKey of selectedDevice?.dataKeys" [value]="dataKey">{{ dataKey }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      
+      </div>
+  
+      <div fxLayout="row" fxLayoutGap="8px" fxLayout.xs="column" fxLayoutGap.xs="0">
+  
+        <mat-form-field class="mat-block">
             <mat-label>Start Time</mat-label>
             <input matInput [matDatepicker]="startTimePicker" formControlName="startTime" required readonly>
             <mat-datepicker-toggle matSuffix [for]="startTimePicker"></mat-datepicker-toggle>
             <mat-datepicker #startTimePicker></mat-datepicker>
         </mat-form-field>
         
-        <mat-form-field fxFlex class="mat-block">
+        <mat-form-field class="mat-block">
             <mat-label>End Time</mat-label>
             <input matInput [matDatepicker]="endTimePicker" formControlName="endTime" required readonly>
             <mat-datepicker-toggle matSuffix [for]="endTimePicker"></mat-datepicker-toggle>
             <mat-datepicker #endTimePicker></mat-datepicker>
         </mat-form-field>
     </div>
-    </div>
-    <mat-toolbar fxLayout="row" fxLayoutAlign="end center">
-    <button mat-button type="submit" color="primary" [disabled]="!editEntityFormGroup.valid">Save</button>
-    </mat-toolbar>
-</form>
+  
+      </div>
+      <button mat-raised-button color="primary" [disabled]="attributeUpdateFormGroup.invalid" type="submit" >
+        Download
+      </button>
+     </div>
+  
+      <div>
+        
+      </div>
+  
+  </form>
+  

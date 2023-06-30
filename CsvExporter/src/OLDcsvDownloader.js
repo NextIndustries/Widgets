@@ -13,34 +13,31 @@ function init() {
     const $scope = self.ctx.$scope;
     const attributeService = $scope.$injector.get(self.ctx.servicesMap.get('attributeService'));
     const importExportService = $scope.$injector.get(self.ctx.servicesMap.get('importExport'));
-    const deviceService = $scope.$injector.get(self.ctx.servicesMap.get('deviceService'));
-    const entityService = $scope.$injector.get(self.ctx.servicesMap.get('entityService'));
 
-    const pageLink = self.ctx.pageLink(10);
-    
+
     $scope.devices = [];
 
     $scope.startTime = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // 7 days ago
     $scope.endTime = new Date(); // Now
 
-    deviceService.getTenantDeviceInfos(pageLink).subscribe(device => {
-                device.data.forEach(res => {
-                    entityService.getEntityKeys(res.id, '', 'timeseries').subscribe(e => {
-                       e.unshift('All');
-                       $scope.devices.push({
-                        name: res.name,
-                        id: res.id,
-                        dataKeys: e
-                        });
-                        $scope.selectedDevice = $scope.devices[0];
-                        $scope.attributeUpdateFormGroup.get('device').setValue($scope.selectedDevice.id);
-                    });
-                });
 
+    if (self.ctx.datasources && self.ctx.datasources.length) {
+        self.ctx.datasources.forEach(e => {
+            const dataKeys = e.dataKeys.map(d => ({ name: d.name }));
+            dataKeys.unshift({ name: 'All' });
+
+            $scope.devices.push({
+                name: e.name,
+                id: e.entityId,
+                dataKeys: dataKeys
             });
+        });
+    }
+
+    $scope.selectedDevice = $scope.devices[0];
 
     $scope.attributeUpdateFormGroup = $scope.fb.group({
-        device: [],
+        device: [$scope.selectedDevice.id],
         startTime: [$scope.startTime],
         endTime: [$scope.endTime],
         timeseriesKey: ['All']
@@ -55,14 +52,14 @@ function init() {
 
         if ($scope.attributeUpdateFormGroup.value.timeseriesKey === 'All') {
             $scope.attributeUpdateFormGroup.value.timeseriesKey = $scope.selectedDevice.dataKeys
-            .filter(key => key !== 'All')
+            .filter(device => device.name !== 'All')
+            .map(device => device.name);
         } else {
             $scope.attributeUpdateFormGroup.value.timeseriesKey = [$scope.attributeUpdateFormGroup.value.timeseriesKey];
         }
 
-        console.log($scope.attributeUpdateFormGroup);
         attributeService.getEntityTimeseries(
-            $scope.attributeUpdateFormGroup.value.device, 
+            { id: $scope.selectedDevice.id, entityType: 'DEVICE' }, 
             $scope.attributeUpdateFormGroup.value.timeseriesKey,
             $scope.attributeUpdateFormGroup.value.startTime.getTime(), 
             $scope.attributeUpdateFormGroup.value.endTime.getTime(), 
