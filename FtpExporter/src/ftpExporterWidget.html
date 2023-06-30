@@ -3,16 +3,16 @@
       
   <div mat-dialog-content fxLayout="column">
 
-<div fxLayout="row" fxLayoutGap="8px" fxLayout.xs="column" fxLayoutGap.xs="0">
+  <div fxLayout="row" fxLayoutGap="8px" fxLayout.xs="column" fxLayoutGap.xs="0">
     
        <mat-form-field class="mat-block">
       <mat-label>Ftp Url</mat-label>
-      <input matInput required formControlName="serverUrl"/>
+      <input matInput required formControlName="serverUrl" [readonly]="connectionSuccessfull || scheduleData"/>
     </mat-form-field>
     
     <mat-form-field class="mat-block">
       <mat-label>Port</mat-label>
-      <input matInput required formControlName="port" type="number" min="1" max="65535"/>
+      <input matInput required formControlName="port" type="number" min="1" max="65535" [readonly]="connectionSuccessfull || scheduleData"/>
     </mat-form-field>
     
   </div>
@@ -21,33 +21,34 @@
     
       <mat-form-field class="mat-block">
       <mat-label>Username</mat-label>
-      <input matInput required formControlName="username"/>
+      <input matInput required formControlName="username" [readonly]="connectionSuccessfull || scheduleData"/>
     </mat-form-field>
     
     <mat-form-field class="mat-block">
       <mat-label>Password</mat-label>
-      <input matInput required type="password" formControlName="password"/>
+      <input matInput required type="password" formControlName="password" [readonly]="connectionSuccessfull || scheduleData"/>
     </mat-form-field>
     
     </div>
     
     <div style="padding-bottom: 20px;" fxLayout="column" fxLayoutGap="8px" fxLayout.xs="column" fxLayoutGap.xs="0">
 
-        <button  mat-raised-button color="primary" 
-        [disabled]="scheduleEventFormGroup.invalid || !scheduleEventFormGroup.dirty || isTestingConnection" 
-        type="button"
-        (click)="testConnection()">
+        <button mat-raised-button color="primary"
+          [disabled]="scheduleEventFormGroup.invalid || isTestingConnection"
+          type="button"
+          (click)="testConnection()"
+          [ngStyle]="{ 'border': connectionSuccessfull === null ? '2px solid red' : '' }">
           Test Connection
         </button>
 
         <div class="help-block" *ngIf="connectionSuccessfull === true" style="padding-top: 5px;">
           <span>Connection Successfull</span>
-          <mat-icon *ngIf="connectionSuccessfull === true" style="color: green;">check_circle</mat-icon>
+          <mat-icon style="color: green;">check_circle</mat-icon>
         </div>
 
         <div class="help-block" *ngIf="connectionSuccessfull === false" style="padding-top: 5px;">
           <span>Check Ftp Credentials</span>
-          <mat-icon *ngIf="connectionSuccessfull === false" style="color: red;">error</mat-icon>
+          <mat-icon style="color: red;">error</mat-icon>
         </div>
 
     </div>
@@ -124,14 +125,22 @@
     </div>
     
     <div fxLayout="column" fxLayoutGap="8px" fxLayout.xs="column" fxLayoutGap.xs="0">
-    <button mat-raised-button color="primary" [disabled]="scheduleEventFormGroup.invalid || !scheduleEventFormGroup.dirty || !connectionSuccessfull" type="submit" >
+    <button mat-raised-button color="primary" [disabled]="scheduleEventFormGroup.invalid 
+    || !connectionSuccessfull 
+    || scheduleData" type="submit">
       Create
     </button>
     
-    <button mat-raised-button color="warn" type="button" (click)="cancelEvent()">
+    <button mat-raised-button color="warn" type="button" (click)="cancelEvent()" [disabled]="!scheduleData">
         Cancel
     </button>
     
+    </div>
+    
+    <div *ngIf="scheduleData">
+        <label>Scheduled Event</label>
+          <div style="width: 100%; height: 100px; border: solid 2px gray" [innerHTML]="scheduleData">
+          </div>
     </div>
     
    </div>
