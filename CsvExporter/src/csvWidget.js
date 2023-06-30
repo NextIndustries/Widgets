@@ -11,6 +11,8 @@ self.onInit = function () {
 function init() {
 
     const $scope = self.ctx.$scope;
+    console.log(self.ctx);
+    
     const attributeService = $scope.$injector.get(self.ctx.servicesMap.get('attributeService'));
     const importExportService = $scope.$injector.get(self.ctx.servicesMap.get('importExport'));
     const deviceService = $scope.$injector.get(self.ctx.servicesMap.get('deviceService'));
@@ -23,9 +25,14 @@ function init() {
     $scope.startTime = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // 7 days ago
     $scope.endTime = new Date(); // Now
 
-    deviceService.getTenantDeviceInfos(pageLink).subscribe(device => {
-                device.data.forEach(res => {
-                    entityService.getEntityKeys(res.id, '', 'timeseries').subscribe(e => {
+    if (self.ctx.datasources && self.ctx.datasources
+        .length && self.ctx.datasources[0].type === 'entity'
+    ) {
+        const entityId = self.ctx.datasources[0].entityId;
+        deviceService.getCustomerDeviceInfos(entityId,
+            pageLink).subscribe(device => {
+                device.data.forEach(element => {
+                    entityService.getEntityKeys(element.id, '', 'timeseries').subscribe(e => {
                        if(e.length === 0){
                            e.push('None');
                        }else{
@@ -33,8 +40,8 @@ function init() {
                        }
                        
                        $scope.devices.push({
-                        name: res.name,
-                        id: res.id,
+                        name: element.name,
+                        id: element.id,
                         dataKeys: e
                         });
                         $scope.selectedDevice = $scope.devices[0];
@@ -43,8 +50,8 @@ function init() {
                         console.log($scope.selectedDevice.dataKeys[0]);
                     });
                 });
-
             });
+    }
 
     $scope.attributeUpdateFormGroup = $scope.fb.group({
         device: [],
