@@ -1,0 +1,52 @@
+<form *ngIf="vVariableFormGroup" [formGroup]="vVariableFormGroup" (ngSubmit)="onSubmit()">
+    <div class="mat-content mat-padding" fxLayout="column">
+        
+    <div mat-dialog-content fxLayout="column">
+  
+  <div fxLayout="row" fxLayoutGap="8px" fxLayout.xs="column" fxLayoutGap.xs="0">
+      
+      <mat-form-field class="mat-block">
+        <mat-label>Timeseries Key</mat-label>
+        <mat-select formControlName="key" (selectionChange)="onKeySelected()">
+          <mat-option *ngFor="let key of keys" [value]="key">{{key}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      
+      <mat-form-field class="mat-block">
+        <mat-label>Calculation</mat-label>
+        <input matInput formControlName="calc"/>
+        </mat-form-field>
+      
+      </div>
+  
+      <!-- <div fxLayout="row" fxLayoutGap="8px" fxLayout.xs="column" fxLayoutGap.xs="0">
+  
+        <mat-form-field class="mat-block">
+            <mat-label>Start Time</mat-label>
+            <input matInput [matDatepicker]="startTimePicker" formControlName="startTime" required readonly>
+            <mat-datepicker-toggle matSuffix [for]="startTimePicker"></mat-datepicker-toggle>
+            <mat-datepicker #startTimePicker></mat-datepicker>
+        </mat-form-field>
+        
+        <mat-form-field class="mat-block">
+            <mat-label>End Time</mat-label>
+            <input matInput [matDatepicker]="endTimePicker" formControlName="endTime" required readonly>
+            <mat-datepicker-toggle matSuffix [for]="endTimePicker"></mat-datepicker-toggle>
+            <mat-datepicker #endTimePicker></mat-datepicker>
+        </mat-form-field>
+    </div> -->
+  
+      </div>
+      <button mat-raised-button color="primary" [disabled]="vVariableFormGroup.invalid" type="submit" >
+        Create
+      </button>
+     </div>
+  
+      <div>
+        
+      </div>
+  
+  </form>
+  
+  
+  
