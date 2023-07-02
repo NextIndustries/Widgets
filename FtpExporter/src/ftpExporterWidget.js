@@ -168,8 +168,8 @@ function init() {
     function getData() {
         ftpService.getScheduledEvent(entityId.id).subscribe(
             function (data) {
-                if (data['Result'] !== '') {
-                    const myData = JSON.parse(data['Result']);
+                if (data['data'] !== '') {
+                    const myData = JSON.parse(data['data']);
 
                     if (myData.method === 'DAILY') {
                         $scope.scheduleData = myData.method +
